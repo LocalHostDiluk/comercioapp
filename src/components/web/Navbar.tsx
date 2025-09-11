@@ -56,7 +56,7 @@ export const Navbar = ({ categories }: NavbarProps) => {
 
         <div className="flex items-center gap-2">
           <SearchInput />
-          <CartButton />
+          <CartButton/>
           <MobileNav categories={categories} />
         </div>
       </div>

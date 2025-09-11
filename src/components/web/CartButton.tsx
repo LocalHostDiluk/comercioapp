@@ -26,7 +26,7 @@ export const CartButton = () => {
 
   return (
     <Link href="/cart" className="relative">
-      <Button variant="outline" size="icon">
+      <Button variant="outline" className="cursor-pointer" size="icon">
         <ShoppingCart className="h-4 w-4" />
       </Button>
       {totalItems > 0 && (

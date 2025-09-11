@@ -56,12 +56,19 @@ export const useCartStore = create<CartState>()(
               ? { ...item, quantity: item.quantity - 1 }
               : item
           );
+          toast.info(`Cantidad de "${existingItem?.name}" actualizada.`);
           return { items: updatedItems };
         }),
       removeProduct: (productId) =>
-        set((state) => ({
-          items: state.items.filter((item) => item.id !== productId),
-        })),
+        set((state) => {
+          const removedItem = state.items.find((item) => item.id === productId);
+          toast.error(
+            `"${removedItem?.name ?? "Producto"}" eliminado del carrito.`
+          );
+          return {
+            items: state.items.filter((item) => item.id !== productId),
+          };
+        }),
       clearCart: () => set({ items: [] }),
     }),
     {

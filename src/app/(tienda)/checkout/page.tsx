@@ -19,7 +19,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
 const formSchema = z.object({
-  name: z.string().min(2, "El nombre debe tener al menos 2 caracteres."),
+  name: z.string().min(10, "El nombre debe tener al menos 10 caracteres."), // <-- CORREGIDO
   phone: z.string().min(10, "El teléfono debe tener 10 dígitos."),
   paymentMethod: z.enum(["card", "pickup"], {
     message: "Debes seleccionar un método de pago.",
@@ -109,7 +109,7 @@ export default function CheckoutPage() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Nombre</FormLabel>
+                    <FormLabel>Nombre y apellido</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -165,7 +165,7 @@ export default function CheckoutPage() {
                 )}
               />
 
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button type="submit" className="w-full cursor-pointer" disabled={isLoading}>
                 {isLoading
                   ? "Procesando..."
                   : `Continuar con el Pedido ($${total.toFixed(2)})`}
