@@ -35,17 +35,23 @@ export function AddProductDialog({
     setIsLoading(true);
 
     try {
+      // La URL de la API ahora es más limpia
       const response = await fetch("/api/products", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...values,
-          searchKeywords: values.searchKeywords, // ✅ ya es string[]
-        }),
+        body: JSON.stringify(values),
       });
 
+      // --- ¡AQUÍ ESTÁ LA MAGIA! ---
       if (!response.ok) {
-        throw new Error("Algo salió mal al crear el producto.");
+        // Si la respuesta no es OK, intentamos leer el cuerpo del error
+        const errorData = await response.json();
+        // Creamos un mensaje de error detallado a partir de los errores de Zod
+        const errorMessage =
+          errorData.errors
+            ?.map((err: any) => `${err.path.join(".")} - ${err.message}`)
+            .join("\n") || "Algo salió mal al crear el producto.";
+        throw new Error(errorMessage);
       }
 
       toast.success("¡Producto añadido con éxito!");
@@ -53,7 +59,11 @@ export function AddProductDialog({
       router.refresh();
     } catch (error) {
       console.error(error);
-      toast.error("No se pudo añadir el producto. Intenta de nuevo.");
+      // Mostramos el mensaje de error detallado que construimos
+      toast.error("Error al añadir producto", {
+        description:
+          error instanceof Error ? error.message : "Intenta de nuevo.",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -67,7 +77,7 @@ export function AddProductDialog({
           Añadir Producto
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Añadir Nuevo Producto</DialogTitle>
           <DialogDescription>

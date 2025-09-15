@@ -1,8 +1,11 @@
+// src/app/(tienda)/api/products/route.ts
 import { NextResponse } from "next/server";
 import { db } from "@/lib/firebase";
 import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
-import { productSchema } from "@/lib/validations/productSchema";
+import { z } from "zod";
+import { productApiSchema } from "@/lib/validations/productSchema";
 
+// La función GET se mantiene igual, es correcta.
 export async function GET() {
   try {
     const productsCollectionRef = collection(db, "products");
@@ -31,14 +34,13 @@ export async function GET() {
   }
 }
 
+// --- NUEVA Y MEJORADA FUNCIÓN POST ---
 export async function POST(request: Request) {
   try {
     const body = await request.json();
+    // 2. Validamos contra el esquema de la API, que espera un array.
+    const parsedData = productApiSchema.parse(body);
 
-    // ✅ Validamos con el schema (transforma keywords a array)
-    const parsedData = productSchema.parse(body);
-
-    // ✅ Guardamos en Firestore
     const docRef = await addDoc(collection(db, "products"), parsedData);
 
     return NextResponse.json(
@@ -46,14 +48,13 @@ export async function POST(request: Request) {
       { status: 201 }
     );
   } catch (error) {
-    if (typeof error === "object" && error !== null && "issues" in error) {
-      return new NextResponse(
-        JSON.stringify((error as { issues: unknown }).issues),
-        { status: 400 }
-      );
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ errors: error.issues }, { status: 400 });
     }
-
     console.error("Error creating product:", error);
-    return new NextResponse("Error interno del servidor", { status: 500 });
+    return NextResponse.json(
+      { message: "Error interno del servidor" },
+      { status: 500 }
+    );
   }
 }
