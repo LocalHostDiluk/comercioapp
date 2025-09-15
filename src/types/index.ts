@@ -8,14 +8,15 @@ export interface Product {
   category: string;
   isActive: boolean;
   isFeatured: boolean;
+  searchKeywords: string[]; // 👈 añadido
 }
 
 export interface Category {
-  id: string; 
+  id: string;
   name: string;
   slug: string;
   description: string;
-  imageUrl: string; 
+  imageUrl: string;
 }
 
 export interface Order {
@@ -33,5 +34,5 @@ export interface Order {
   total: number;
   paymentMethod: "card" | "pickup";
   status: "Pagado" | "Pendiente de Pago" | "Entregado" | "Cancelado";
-  createdAt: Date; // O un tipo más específico de Firestore Timestamp
+  createdAt: Date;
 }

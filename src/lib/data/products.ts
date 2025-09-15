@@ -181,3 +181,39 @@ export const getAllProducts = async (): Promise<Product[]> => {
     return [];
   }
 };
+
+export const getAdminProductsByCategory = async (
+  categorySlug: string
+): Promise<Product[]> => {
+  try {
+    const productsCollectionRef = collection(db, "products");
+
+    // La única diferencia es que NO filtramos por 'isActive'
+    const q = firestoreQuery(
+      productsCollectionRef,
+      where("category", "==", categorySlug)
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      return [];
+    }
+
+    const products: Product[] = querySnapshot.docs.map(
+      (doc) =>
+        ({
+          id: doc.id,
+          ...doc.data(),
+        } as Product)
+    );
+
+    return products;
+  } catch (error) {
+    console.error(
+      `Error fetching admin products for category ${categorySlug}:`,
+      error
+    );
+    return [];
+  }
+};
